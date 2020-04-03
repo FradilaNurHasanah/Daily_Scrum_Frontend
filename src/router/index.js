@@ -22,7 +22,7 @@ const routes = [
   },
   {
     path: '/register',
-    name: 'register',
+    name: 'Register',
     components: {default: Register, footer: Footer}
   },
   {

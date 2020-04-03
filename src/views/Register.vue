@@ -7,11 +7,11 @@
             <div class="col-lg-4 mx-auto">
               <div class="auth-form-light text-left p-5">
                 <div class="navbar-brand brand-logo">
-                  <img src="assets/img/logo.svg">
+                  <img src="assets/img/logo.png">
                 </div>
                 <h4>Selamat datang!</h4>
                 <h6 class="font-weight-light">Daftar untuk menggunakan aplikasi daily scrum.</h6>
-                <form v-on:submit.prevent="register" class="pt-3" method="post" action="#">
+                <form v-on:submit.prevent="Register" class="pt-3" method="post" action="#">
                   <div class="form-group">
                     <div class="input-group">
                       <div class="input-group-prepend bg-transparent">
@@ -78,27 +78,35 @@
 </template>
 
 <script>
-export default {
-    data() {
-      return {
-        firstname: '',
-        lastname: '',
-        email: '',
-        password: '',
-        password_verify: ''
-      }
-    },
-    methods: {
-        Register: function(){
-            let firstname = this.firstname
-            let lastname = this.lastname
-            let email = this.email //let itu variabel baru
-            let password = this.password
-            let password_verify = this.password_verify
-            this.$store.dispatch('register', { firstname, lastname, email, password, password_verify })
-            .then(() => this.$router.push('/dailyscrum'))
-            .catch(err => console.log(err))
-        }
+module.exports = {
+  data(){
+    return {
+      firstname: "",
+      lastname: "",
+      email: "",
+      password: "",
+      password_verify: "",
+    };
+  },
+
+  methods: {
+    Register : function(){
+      let firstname = this.firstname;
+      let lastname = this.lastname;
+      let email = this.email;
+      let password = this.password;
+      let password_verify = this.password_verify;
+      this.$store
+      .dispatch('register',{
+        firstname,
+        lastname,
+        email,
+        password,
+        password_verify
+      })
+      .then(() => this.$router.push('/login'))
+      .catch(err => console.log(err));
     }
-}
+  }       
+};
 </script>

@@ -115,3 +115,151 @@
     </div>
 </template>
 
+<script>
+module.exports = {
+  data : function(){
+    return {
+      search: "",
+      id: "",
+      id_users: "this.id_users",
+      team: "",
+      activity_yesterday: "",
+      activity_today: "",
+      problem_yesterday: "",
+      solution: "",
+      action: "",
+      message: "",
+      currentPage: 1,
+      rows: 0,
+      perPage: 10,
+      key: "",
+      dataDaily_Scrum: [],
+      daily_scrum: [],
+      users: [],
+      fields: ["tanggal", "activity_yesterday", "activity_today", "problem_yesterday","solution" ,"Aksi"],
+    }
+  },
+ methods: {
+    getData: function() {
+        let conf = { headers: { Authorization: "Bearer " + this.key } };
+        let offset = (this.currentPage - 1) * this.perPage;
+        // let id_users = this.response.data.user.id;
+        // this.$bvToast.show("loadingToast");
+       this.axios
+        .get("/login/check", conf)
+        .then(response => {
+          this.id_users = response.data.user.id;
+          this.axios.get("/Daily_Scrum/" + this.perPage + "/" + offset + "/" + response.data.user.id, conf)
+            .then(response => {
+              this.status = response.data.status;
+              if (response.data.status == 1) {
+                this.Daily_Scrum = response.data.daily_scrum;
+                console.log(response.data.count);
+     
+                if (response.data.count == 0) {
+                  this.status = 0;
+          
+                }
+              } else {
+                console.log("Data Tidak Ditemukan");
+          
+              }
+            })
+            // .catch(error => {
+            //   console.log(error);
+            //   this.loading = false;
+            // });
+        })
+        // .catch(error => {
+        //   console.log(error);
+        //   this.loading = false;
+        // });
+      },
+    pagination : function(){
+      if(this.search == ""){
+        this.getData();
+      } else {
+        this.searching();
+      }
+    },
+    Add : function(){
+      this.action = "insert";
+      this.team = "";
+      this.activity_yesterday = "";
+      this.activity_today = ""; 
+      this.problem_yesterday = ""; 
+      this.solution = ""; 
+      
+    },
+    Save : function(){
+      let conf = { headers: { "Authorization" : 'Bearer ' + this.key } };
+      this.$bvToast.show("loadingToast");
+      if(this.action === "insert"){
+        let form = new FormData();
+        form.append("id", this.id);
+        form.append("team", this.team);
+        form.append("activity_yesterday", this.activity_yesterday);
+        form.append("activity_today", this.activity_today);
+        form.append("problem_yesterday", this.problem_yesterday);
+        form.append("solution", this.solution);
+        this.axios.post("/Daily_Scrum", form, conf)
+        .then(response => {
+          this.$bvToast.hide("loadingToast");
+          if(this.search == ""){
+            this.getData();
+          } else {
+            this.searching();
+          }
+          this.message = response.data.message;
+          this.$bvToast.show("message");
+        })
+        .catch(error => {
+          console.log(error);
+        });
+      } else {
+        let form = {
+          team: this.team,
+          activity_yesterday: this.activity_yesterday,
+          activity_today: this.activity_today,
+          problem_yesterday: this.problem_yesterday,
+          solution: this.solution
+        }
+        this.axios.put("/Daily_Scrum/" + this.id, form, conf)
+        .then(response => {
+          this.$bvToast.hide("loadingToast");
+          if(this.search == ""){
+            this.getData();
+          } else {
+            this.searching();
+          }
+          this.message = response.data.message;
+          this.$bvToast.show("message");
+        })
+        .catch(error => {
+          console.log(error);
+        });
+      }
+    },
+    Drop : function(id){
+      let conf = { headers: { "Authorization" : "Bearer " + this.key} };
+      if(confirm('Apakah anda yakin ingin menghapus data ini?')){
+        this.$bvToast.show("loadingToast");
+        this.axios.delete("/Daily_Scrum/" + id, conf)
+        .then(response => {
+            this.getData();
+            this.$bvToast.hide("loadingToast");
+            this.message = response.data.message;
+            this.$bvToast.show("message");
+        })
+        .catch(error => {
+          console.log(error);
+        });
+      }
+    },
+  },
+  mounted(){
+    this.key = localStorage.getItem("Authorization");
+    this.getData();
+  }
+}
+</script>
